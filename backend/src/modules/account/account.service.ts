@@ -40,7 +40,7 @@ export class AccountService {
     });
 
     if (!account) {
-      throw new NotFoundException('Account not found');
+      throw new NotFoundException('Account not found.');
     }
 
     return account;
