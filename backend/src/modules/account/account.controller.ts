@@ -63,6 +63,10 @@ export class AccountController {
     @Param('number') number: string,
     @Body('amount') amount: string,
   ) {
+    if (!amount) {
+      throw new BadRequestException('Amount is required.');
+    }
+
     const updatedAccount = await this.accountService.creditToAccount(
       Number(number),
       Number(amount),
@@ -75,6 +79,31 @@ export class AccountController {
         number: updatedAccount.number,
         balance: updatedAccount.balance,
       },
+    };
+  }
+
+  @Patch(':fromNumber/transfer')
+  async transferAmount(
+    @Param('fromNumber') fromNumber: string,
+    @Body('toNumber') toNumber: string,
+    @Body('amount') amount: string,
+  ) {
+    if (!toNumber || !amount) {
+      throw new BadRequestException(
+        'To account number and amount are required.',
+      );
+    }
+
+    const updatedAccounts = await this.accountService.transferAmount(
+      Number(fromNumber),
+      Number(toNumber),
+      Number(amount),
+    );
+
+    return {
+      status: HttpStatus.OK,
+      message: 'Amount transferred successfully!',
+      updatedAccounts,
     };
   }
 }
