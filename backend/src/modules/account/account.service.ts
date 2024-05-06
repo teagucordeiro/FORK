@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 
@@ -70,5 +71,37 @@ export class AccountService {
     });
 
     return updatedAccount;
+  }
+
+  async transferAmount(from: number, to: number, amount: number) {
+    const fromAccount = await this.getAccountByNumber(from);
+    const toAccount = await this.getAccountByNumber(to);
+
+    if (!fromAccount) {
+      throw new NotFoundException('From account not found.');
+    }
+
+    if (!toAccount) {
+      throw new NotFoundException('To account not found.');
+    }
+
+    const updatedFromAccount = await this.prisma.account.update({
+      where: { number: fromAccount.number },
+      data: {
+        balance: fromAccount.balance - amount,
+      },
+    });
+
+    const updatedToAccount = await this.prisma.account.update({
+      where: { number: toAccount.number },
+      data: {
+        balance: toAccount.balance + amount,
+      },
+    });
+
+    return {
+      fromAccount: updatedFromAccount,
+      toAccount: updatedToAccount,
+    };
   }
 }
