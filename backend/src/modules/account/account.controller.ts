@@ -57,4 +57,24 @@ export class AccountController {
       },
     };
   }
+
+  @Patch(':number/credit')
+  async creditToAccount(
+    @Param('number') number: string,
+    @Body('amount') amount: string,
+  ) {
+    const updatedAccount = await this.accountService.creditToAccount(
+      Number(number),
+      Number(amount),
+    );
+
+    return {
+      status: HttpStatus.OK,
+      message: 'Amount credited to account successfully!',
+      updatedAccount: {
+        number: updatedAccount.number,
+        balance: updatedAccount.balance,
+      },
+    };
+  }
 }
