@@ -6,6 +6,7 @@ import {
   Post,
   Param,
   BadRequestException,
+  Patch,
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 
@@ -34,6 +35,26 @@ export class AccountController {
     return {
       status: HttpStatus.OK,
       balance: account.balance,
+    };
+  }
+
+  @Patch(':number/debit')
+  async debitFromAccount(
+    @Param('number') number: string,
+    @Body('amount') amount: string,
+  ) {
+    const updatedAccount = await this.accountService.debitFromAccount(
+      Number(number),
+      Number(amount),
+    );
+
+    return {
+      status: HttpStatus.OK,
+      message: 'Amount debited from account successfully!',
+      updatedAccount: {
+        number: updatedAccount.number,
+        balance: updatedAccount.balance,
+      },
     };
   }
 }

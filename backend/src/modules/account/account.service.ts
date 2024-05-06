@@ -45,4 +45,17 @@ export class AccountService {
 
     return account;
   }
+
+  async debitFromAccount(number: number, amount: number) {
+    const account = await this.getAccountByNumber(number);
+
+    const updatedAccount = await this.prisma.account.update({
+      where: { number: account.number },
+      data: {
+        balance: account.balance - amount,
+      },
+    });
+
+    return updatedAccount;
+  }
 }
