@@ -77,7 +77,7 @@ function askForInput(question) {
 
 async function createAccount(number) {
   try {
-    const response = await axios.post("http://localhost:3000/account/create", {
+    const response = await axios.post("http://localhost:3000/accounts", {
       number,
     });
     console.log("\n", response.data, "\n");
@@ -89,7 +89,7 @@ async function createAccount(number) {
 async function getAccountBalance(number) {
   try {
     const response = await axios.get(
-      `http://localhost:3000/account/${number}/balance`
+      `http://localhost:3000/accounts/${number}/balance`
     );
     console.log("\n", response.data, "\n");
   } catch (error) {
@@ -103,7 +103,7 @@ async function getAccountBalance(number) {
 async function debitFromAccount(number, amount) {
   try {
     const response = await axios.patch(
-      `http://localhost:3000/account/${number}/debit`,
+      `http://localhost:3000/accounts/${number}/debit`,
       { amount }
     );
     console.log("\n", response.data, "\n");
@@ -115,7 +115,7 @@ async function debitFromAccount(number, amount) {
 async function creditToAccount(number, amount) {
   try {
     const response = await axios.patch(
-      `http://localhost:3000/account/${number}/credit`,
+      `http://localhost:3000/accounts/${number}/credit`,
       { amount }
     );
     console.log("\n", response.data, "\n");
@@ -127,7 +127,7 @@ async function creditToAccount(number, amount) {
 async function transfer(fromNumber, toNumber, amount) {
   try {
     const response = await axios.patch(
-      `http://localhost:3000/account/${fromNumber}/transfer`,
+      `http://localhost:3000/accounts/${fromNumber}/transfer`,
       { toNumber, amount }
     );
     console.log("\n", response.data, "\n");

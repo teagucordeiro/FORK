@@ -12,10 +12,10 @@ import { AccountService } from './account.service';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('accounts')
-@Controller('account')
+@Controller('accounts')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
-  @Post('create')
+  @Post()
   async createAccount(@Body('number') number: string) {
     if (!number) {
       throw new BadRequestException('Account number is required.');
