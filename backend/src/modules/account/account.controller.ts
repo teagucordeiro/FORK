@@ -10,18 +10,29 @@ import {
 } from '@nestjs/common';
 import { AccountService } from './account.service';
 import { ApiTags } from '@nestjs/swagger';
+import { AccountOptions } from './account.entity';
 
 @ApiTags('accounts')
 @Controller('accounts')
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
   @Post()
-  async createAccount(@Body('number') number: string) {
+  async createAccount(
+    @Body('number') number: string,
+    @Body('type') type: AccountOptions,
+  ) {
     if (!number) {
       throw new BadRequestException('Account number is required.');
     }
 
-    const account = await this.accountService.createAccount(Number(number));
+    if (!type) {
+      throw new BadRequestException('Account type is required.');
+    }
+
+    const account = await this.accountService.createAccount(
+      Number(number),
+      type,
+    );
     return {
       status: HttpStatus.CREATED,
       message: 'Account created!',
