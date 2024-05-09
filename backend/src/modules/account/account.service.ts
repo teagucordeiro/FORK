@@ -49,36 +49,42 @@ export class AccountService {
   }
   async debitFromAccount(number: number, amount: number) {
     const account = await this.getAccountByNumber(number);
+
+    const updatedAccount = await this.prisma.account.update({
+      where: { number: account.number },
+      data: {
+        balance: account.balance - amount,
+      },
+    });
+
+    return updatedAccount;
+  }
+  async creditToAccount(number: number, amount: number) {
+    const account = await this.getAccountByNumber(number);
     let data: Account = {
       ...account,
-      balance: account.balance - amount,
+      balance: account.balance + amount,
     };
     if (account.type === 'Bonus') {
       data = {
         ...data,
         bonusScore: addPointsToBonusAccount({
           currentBonusAccount: account.bonusScore,
-          operationType: 'debit',
+          operationType: 'credit',
           value: amount,
         }),
       };
     }
+
+    delete data.id;
+
     const updatedAccount = await this.prisma.account.update({
       where: { number: account.number },
       data,
     });
     return updatedAccount;
   }
-  async creditToAccount(number: number, amount: number) {
-    const account = await this.getAccountByNumber(number);
-    const updatedAccount = await this.prisma.account.update({
-      where: { number: account.number },
-      data: {
-        balance: account.balance + amount,
-      },
-    });
-    return updatedAccount;
-  }
+
   async transferAmount(from: number, to: number, amount: number) {
     const fromAccount = await this.getAccountByNumber(from);
     const toAccount = await this.getAccountByNumber(to);

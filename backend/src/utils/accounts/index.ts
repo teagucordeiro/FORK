@@ -1,4 +1,4 @@
-type operationBetweenAccountsTypes = 'debit' | 'transfer';
+type operationBetweenAccountsTypes = 'credit' | 'transfer';
 
 interface IcalculateBonusByOperationTypeAttributes {
   operationType: operationBetweenAccountsTypes;
@@ -8,7 +8,7 @@ interface IcalculateBonusByOperationTypeAttributes {
 export function calculateBonusByOperationType(
   param: IcalculateBonusByOperationTypeAttributes,
 ) {
-  if (param.operationType === 'debit') {
+  if (param.operationType === 'credit') {
     return Math.trunc(param.value / 100);
   }
 
