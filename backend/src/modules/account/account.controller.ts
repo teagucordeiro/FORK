@@ -45,6 +45,18 @@ export class AccountController {
     @Param('number') number: string,
     @Body('amount') amount: string,
   ) {
+    if (!number) {
+      throw new BadRequestException('Account number is required.');
+    }
+
+    if (!amount) {
+      throw new BadRequestException('Amount is required.');
+    }
+
+    if (Number(amount) < 0) {
+      throw new BadRequestException('Amount should be greater than 0.');
+    }
+
     const updatedAccount = await this.accountService.debitFromAccount(
       Number(number),
       Number(amount),
@@ -67,6 +79,10 @@ export class AccountController {
   ) {
     if (!amount) {
       throw new BadRequestException('Amount is required.');
+    }
+
+    if (Number(amount) < 0) {
+      throw new BadRequestException('Amount should be greater than 0.');
     }
 
     const updatedAccount = await this.accountService.creditToAccount(
@@ -94,6 +110,10 @@ export class AccountController {
       throw new BadRequestException(
         'To account number and amount are required.',
       );
+    }
+
+    if(Number(amount) < 0) {
+      throw new BadRequestException('Amount should be greater than 0.');
     }
 
     const updatedAccounts = await this.accountService.transferAmount(
