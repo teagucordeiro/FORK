@@ -119,4 +119,40 @@ export class AccountController {
       updatedAccounts,
     };
   }
+
+  @Patch(':number/yield-interest')
+  async yieldInterestByAccount(
+    @Param('number') number: number,
+    @Body('interestRate') interestRate: number,
+  ) {
+    if (!interestRate) {
+      throw new BadRequestException('Interest rate is required.');
+    }
+
+    const updatedAccounts = await this.accountService.yieldInterestByAccount(
+      Number(number),
+      Number(interestRate),
+    );
+    return {
+      status: HttpStatus.OK,
+      message: 'Interest yielded successfully!',
+      updatedAccounts,
+    };
+  }
+
+  @Patch('yield-interest')
+  async yieldInterest(@Body('interestRate') interestRate: number) {
+    if (!interestRate) {
+      throw new BadRequestException('Interest rate is required.');
+    }
+
+    const updatedAccounts = await this.accountService.yieldInterest(
+      Number(interestRate),
+    );
+    return {
+      status: HttpStatus.OK,
+      message: 'Interest yielded successfully!',
+      updatedAccounts,
+    };
+  }
 }
