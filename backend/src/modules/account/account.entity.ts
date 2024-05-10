@@ -1,4 +1,4 @@
-export type AccountOptions = 'Default' | 'Bonus';
+export type AccountOptions = 'Default' | 'Bonus' | 'Saving';
 
 export class AccountEntity {
   id?: string;
