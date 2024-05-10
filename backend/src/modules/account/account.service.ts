@@ -57,6 +57,10 @@ export class AccountService {
   async debitFromAccount(number: number, amount: number) {
     const account = await this.getAccountByNumber(number);
 
+    if (account.balance < amount) {
+      throw new BadRequestException('Insufficient balance.');
+    }
+
     const updatedAccount = await this.prisma.account.update({
       where: { number: account.number },
       data: {
@@ -98,6 +102,10 @@ export class AccountService {
   async transferAmount(from: number, to: number, amount: number) {
     const fromAccount = await this.getAccountByNumber(from);
     const toAccount = await this.getAccountByNumber(to);
+
+    if (fromAccount.balance < amount) {
+      throw new BadRequestException('Insufficient balance.');
+    }
 
     if (!fromAccount) {
       throw new NotFoundException('From account not found.');
