@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { Account } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
@@ -10,7 +11,7 @@ import { addPointsToBonusAccount } from 'src/utils/accounts';
 @Injectable()
 export class AccountService {
   constructor(private prisma: PrismaService) {}
-  async createAccount(number: number, type: AccountOptions) {
+  async createAccount(number: number, type: AccountOptions, balance: number) {
     const existingAccount = await this.prisma.account.findFirst({
       where: {
         number,
@@ -34,6 +35,16 @@ export class AccountService {
         ...newAccount,
         bonusScore: 10,
       };
+    }
+
+    if (type === 'Saving') {
+      if (!balance) {
+        throw new BadRequestException(
+          'Balance is required to saving accounts.',
+        );
+      }
+
+      newAccount.balance = balance;
     }
 
     return this.prisma.account.create({

@@ -99,9 +99,15 @@ async function chooseAccountType() {
 
 async function createAccount(number, type) {
   try {
+    let initialBalance = null;
+    if (type === "Saving") {
+      initialBalance = await askForInput("Digite o saldo inicial: ");
+    }
+
     const response = await axios.post("http://localhost:3000/accounts", {
       number,
       type,
+      initialBalance,
     });
     console.log(response.data);
   } catch (error) {

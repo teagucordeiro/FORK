@@ -20,6 +20,7 @@ export class AccountController {
   async createAccount(
     @Body('number') number: string,
     @Body('type') type: AccountOptions,
+    @Body('balance') balance?: string,
   ) {
     if (!number) {
       throw new BadRequestException('Account number is required.');
@@ -32,6 +33,7 @@ export class AccountController {
     const account = await this.accountService.createAccount(
       Number(number),
       type,
+      balance,
     );
     return {
       status: HttpStatus.CREATED,
@@ -123,7 +125,7 @@ export class AccountController {
       );
     }
 
-    if(Number(amount) < 0) {
+    if (Number(amount) < 0) {
       throw new BadRequestException('Amount should be greater than 0.');
     }
 
