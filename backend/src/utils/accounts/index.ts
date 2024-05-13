@@ -13,7 +13,7 @@ export function calculateBonusByOperationType(
   }
 
   if (param.operationType === 'transfer') {
-    return Math.trunc(param.value / 200);
+    return Math.trunc(param.value / 150);
   }
 }
 
