@@ -7,7 +7,11 @@ import {
 import { Account } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { AccountEntity, AccountOptions } from './account.entity';
-import { addPointsToBonusAccount } from 'src/utils/accounts';
+import {
+  addPointsToBonusAccount,
+  isDefaultOrBonusWithExcessiveDebt,
+} from 'src/utils/accounts';
+import { MAXIMUM_NEGATIVE_BALANCE_ALLOWED } from 'src/utils/accounts/constants';
 @Injectable()
 export class AccountService {
   constructor(private prisma: PrismaService) {}
@@ -45,6 +49,16 @@ export class AccountService {
       };
     }
 
+    if (type === 'Saving') {
+      if (!balance) {
+        throw new BadRequestException(
+          'Balance is required to saving accounts.',
+        );
+      }
+
+      newAccount.balance = balance;
+    }
+
     return this.prisma.account.create({
       data: newAccount,
     });
@@ -63,11 +77,18 @@ export class AccountService {
 
     return account;
   }
-  async debitFromAccount(number: number, amount: number) {
-    const account = await this.getAccountByNumber(number);
 
-    if (account.balance < amount) {
+  async debitFromAccount(number: number, amount: number) {
+    const account = (await this.getAccountByNumber(number)) as AccountEntity;
+
+    if (account.balance < amount && account.type === 'Saving') {
       throw new BadRequestException('Insufficient balance.');
+    }
+
+    if (isDefaultOrBonusWithExcessiveDebt(account, amount)) {
+      throw new BadRequestException(
+        `Debits amount exceeds maximum allowed negative balance (${MAXIMUM_NEGATIVE_BALANCE_ALLOWED}).`,
+      );
     }
 
     const updatedAccount = await this.prisma.account.update({
@@ -109,11 +130,17 @@ export class AccountService {
   }
 
   async transferAmount(from: number, to: number, amount: number) {
-    const fromAccount = await this.getAccountByNumber(from);
+    const fromAccount = (await this.getAccountByNumber(from)) as AccountEntity;
     const toAccount = await this.getAccountByNumber(to);
 
-    if (fromAccount.balance < amount) {
+    if (fromAccount.balance < amount && fromAccount.type === 'Saving') {
       throw new BadRequestException('Insufficient balance.');
+    }
+
+    if (isDefaultOrBonusWithExcessiveDebt(fromAccount, amount)) {
+      throw new BadRequestException(
+        `Transfer amount exceeds maximum allowed negative balance (${MAXIMUM_NEGATIVE_BALANCE_ALLOWED}).`,
+      );
     }
 
     if (!fromAccount) {

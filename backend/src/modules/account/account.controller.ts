@@ -21,6 +21,7 @@ export class AccountController {
     @Body('number') number: string,
     @Body('balance') balance: string,
     @Body('type') type: AccountOptions,
+    @Body('balance') balance?: string,
   ) {
     if (!number) {
       throw new BadRequestException('Account number is required.');
