@@ -10,7 +10,7 @@ async function askUser() {
   let exit = false;
   while (!exit) {
     const answer = await askForInput(
-      "\nEscolha a ação desejada:\n1. Criar conta\n2. Conferir saldo\n3. Debitar de uma conta\n4. Creditar em uma conta\n5. Transferir entre contas\n6. Sair\nEscolha o número da opção:"
+      "Escolha a ação desejada:\n1. Criar conta\n2. Conferir saldo\n3. Debitar de uma conta\n4. Creditar em uma conta\n5. Transferir entre contas\n6. Rendimento de juros\n7. Sair\nEscolha o número da opção: "
     );
 
     switch (answer) {
@@ -18,13 +18,14 @@ async function askUser() {
         const createNumber = await askForInput(
           "Digite o número da conta que deseja criar: "
         );
-        await createAccount(createNumber);
+        const accountType = await chooseAccountType();
+        createAccount(createNumber, accountType);
         break;
       case "2":
         const checkNumber = await askForInput(
           "Digite o número da conta que deseja conferir o saldo: "
         );
-        await getAccountBalance(checkNumber);
+        getAccountBalance(checkNumber);
         break;
       case "3":
         const debitNumber = await askForInput(
@@ -33,7 +34,7 @@ async function askUser() {
         const debitAmount = await askForInput(
           "Digite o valor a ser debitado: "
         );
-        await debitFromAccount(debitNumber, debitAmount);
+        debitFromAccount(debitNumber, debitAmount);
         break;
       case "4":
         const creditNumber = await askForInput(
@@ -42,7 +43,7 @@ async function askUser() {
         const creditAmount = await askForInput(
           "Digite o valor a ser creditado: "
         );
-        await creditToAccount(creditNumber, creditAmount);
+        creditToAccount(creditNumber, creditAmount);
         break;
       case "5":
         const fromNumber = await askForInput(
@@ -54,9 +55,13 @@ async function askUser() {
         const transferAmount = await askForInput(
           "Digite o valor a ser transferido: "
         );
-        await transfer(fromNumber, toNumber, transferAmount);
+        transfer(fromNumber, toNumber, transferAmount);
         break;
       case "6":
+        const interestRate = await askForInput("Digite a taxa de juros: ");
+        yieldInterest(interestRate);
+        break;
+      case "7":
         exit = true;
         console.log("Saindo...");
         rl.close();
@@ -75,12 +80,30 @@ function askForInput(question) {
   });
 }
 
-async function createAccount(number) {
+async function chooseAccountType() {
+  const accountType = await askForInput(
+    "\nEscolha o tipo de conta:\n1. Conta Corrente\n2. Conta Bônus\n3. Conta Poupança\nEscolha o número da opção: "
+  );
+  switch (accountType) {
+    case "1":
+      return "Default";
+    case "2":
+      return "Bonus";
+    case "3":
+      return "Saving";
+    default:
+      console.log("Tipo de conta inválido.");
+      return null;
+  }
+}
+
+async function createAccount(number, type) {
   try {
     const response = await axios.post("http://localhost:3000/accounts", {
       number,
+      type,
     });
-    console.log("\n", response.data, "\n");
+    console.log(response.data);
   } catch (error) {
     console.error("Error creating account:", error.response.data.message);
   }
@@ -91,7 +114,7 @@ async function getAccountBalance(number) {
     const response = await axios.get(
       `http://localhost:3000/accounts/${number}/balance`
     );
-    console.log("\n", response.data, "\n");
+    console.log(response.data);
   } catch (error) {
     console.error(
       "Error getting account balance:",
@@ -106,7 +129,7 @@ async function debitFromAccount(number, amount) {
       `http://localhost:3000/accounts/${number}/debit`,
       { amount }
     );
-    console.log("\n", response.data, "\n");
+    console.log(response.data);
   } catch (error) {
     console.error("Error debiting from account:", error.response.data.message);
   }
@@ -118,7 +141,7 @@ async function creditToAccount(number, amount) {
       `http://localhost:3000/accounts/${number}/credit`,
       { amount }
     );
-    console.log("\n", response.data, "\n");
+    console.log(response.data);
   } catch (error) {
     console.error("Error crediting to account:", error.response.data.message);
   }
@@ -130,9 +153,21 @@ async function transfer(fromNumber, toNumber, amount) {
       `http://localhost:3000/accounts/${fromNumber}/transfer`,
       { toNumber, amount }
     );
-    console.log("\n", response.data, "\n");
+    console.log(response.data);
   } catch (error) {
     console.error("Error transferring amount:", error.response.data.message);
+  }
+}
+
+async function yieldInterest(interestRate) {
+  try {
+    const response = await axios.patch(
+      "http://localhost:3000/accounts/yield-interest",
+      { interestRate }
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error("Error yielding interest:", error.response.data.message);
   }
 }
 
