@@ -10,7 +10,7 @@ import { PrismaService } from 'src/prisma.service';
 export class AccountService {
   constructor(private prisma: PrismaService) {}
 
-  async createAccount(number: number) {
+  async createAccount(number: number, balance: number) {
     const existingAccount = await this.prisma.account.findFirst({
       where: {
         number,
@@ -25,7 +25,7 @@ export class AccountService {
 
     const newAccount = {
       number: number,
-      balance: 0,
+      balance,
     };
 
     return this.prisma.account.create({

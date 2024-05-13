@@ -16,16 +16,27 @@ import { ApiTags } from '@nestjs/swagger';
 export class AccountController {
   constructor(private readonly accountService: AccountService) {}
   @Post()
-  async createAccount(@Body('number') number: string) {
+  async createAccount(
+    @Body('number') number: string,
+    @Body('balance') balance: string,
+  ) {
     if (!number) {
       throw new BadRequestException('Account number is required.');
     }
 
-    const account = await this.accountService.createAccount(Number(number));
+    if (!balance) {
+      throw new BadRequestException('Balance is required.');
+    }
+
+    const account = await this.accountService.createAccount(
+      Number(number),
+      Number(balance),
+    );
     return {
       status: HttpStatus.CREATED,
       message: 'Account created!',
       account,
+      balance,
     };
   }
 
@@ -112,7 +123,7 @@ export class AccountController {
       );
     }
 
-    if(Number(amount) < 0) {
+    if (Number(amount) < 0) {
       throw new BadRequestException('Amount should be greater than 0.');
     }
 
