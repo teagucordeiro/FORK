@@ -18,8 +18,17 @@ async function askUser() {
         const createNumber = await askForInput(
           "Digite o número da conta que deseja criar: "
         );
+
         const accountType = await chooseAccountType();
-        createAccount(createNumber, accountType);
+        const typesThatNeedBalance = ["Default", "Saving"];
+
+        let balance = 0;
+
+        if (typesThatNeedBalance.includes(accountType)) {
+          balance = await insertBalance();
+        }
+
+        createAccount(createNumber, accountType, balance);
         break;
       case "2":
         const checkNumber = await askForInput(
@@ -97,11 +106,17 @@ async function chooseAccountType() {
   }
 }
 
-async function createAccount(number, type) {
+async function insertBalance() {
+  const balance = await askForInput("Digite o saldo inicial: ");
+  return balance;
+}
+
+async function createAccount(number, type, balance) {
   try {
     const response = await axios.post("http://localhost:3000/accounts", {
       number,
       type,
+      balance,
     });
     console.log(response.data);
   } catch (error) {
