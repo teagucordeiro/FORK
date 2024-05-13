@@ -33,7 +33,7 @@ export class AccountController {
     const account = await this.accountService.createAccount(
       Number(number),
       type,
-      balance,
+      Number(balance),
     );
     return {
       status: HttpStatus.CREATED,
