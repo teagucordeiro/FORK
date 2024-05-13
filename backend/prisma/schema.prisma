@@ -17,4 +17,6 @@ model Account {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
   number  Int @unique
   balance Float
+  type String
+  bonusScore Int?
 }
