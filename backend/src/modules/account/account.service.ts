@@ -28,10 +28,18 @@ export class AccountService {
       );
     }
 
+    const accountTypesThatRequireBalance = ['Saving', 'Default'];
+
+    if (accountTypesThatRequireBalance.includes(type) && !balance) {
+      throw new BadRequestException(
+        'Initial balance is required for this account type.',
+      );
+    }
+
     let newAccount: AccountEntity = {
       number: number,
-      balance: 0,
       type,
+      balance,
     };
 
     if (type === 'Bonus') {

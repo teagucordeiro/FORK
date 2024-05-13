@@ -18,8 +18,16 @@ async function askUser() {
         const createNumber = await askForInput(
           "Digite o número da conta que deseja criar: "
         );
+
         const accountType = await chooseAccountType();
-        const balance = await insertBalance();
+        const typesThatNeedBalance = ["Default", "Saving"];
+
+        let balance = 0;
+
+        if (typesThatNeedBalance.includes(accountType)) {
+          balance = await insertBalance();
+        }
+
         createAccount(createNumber, accountType, balance);
         break;
       case "2":

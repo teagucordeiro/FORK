@@ -19,6 +19,7 @@ export class AccountController {
   @Post()
   async createAccount(
     @Body('number') number: string,
+    @Body('balance') balance: string,
     @Body('type') type: AccountOptions,
     @Body('balance') balance?: string,
   ) {
@@ -39,6 +40,7 @@ export class AccountController {
       status: HttpStatus.CREATED,
       message: 'Account created!',
       account,
+      balance,
     };
   }
 
