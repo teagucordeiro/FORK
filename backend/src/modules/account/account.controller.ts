@@ -46,7 +46,7 @@ export class AccountController {
     };
   }
 
-  @Get(':number/')
+  @Get(':number')
   async getAccountDetails(
     @Param('number') number: string,
     @Res() response: Response,
