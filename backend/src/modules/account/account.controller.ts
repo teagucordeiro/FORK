@@ -128,6 +128,7 @@ export class AccountController {
       updatedAccount: {
         number: updatedAccount.number,
         balance: updatedAccount.balance,
+        bonusScore: updatedAccount.bonusScore,
       },
     };
   }
