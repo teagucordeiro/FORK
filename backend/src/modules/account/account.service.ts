@@ -5,7 +5,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { Account } from '@prisma/client';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../../prisma.service';
 import { AccountEntity, AccountOptions } from './account.entity';
 import {
   addPointsToBonusAccount,
@@ -15,6 +15,7 @@ import { MAXIMUM_NEGATIVE_BALANCE_ALLOWED } from 'src/utils/accounts/constants';
 @Injectable()
 export class AccountService {
   constructor(private prisma: PrismaService) {}
+
   async createAccount(number: number, type: AccountOptions, balance: number) {
     const existingAccount = await this.prisma.account.findFirst({
       where: {
