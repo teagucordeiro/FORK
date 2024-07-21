@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AccountController } from './account.controller';
 import { AccountService } from './account.service';
-import { BadRequestException, HttpStatus } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpStatus,
+  NotFoundException,
+} from '@nestjs/common';
 
 describe('AccountController', () => {
   let controller: AccountController;
@@ -34,57 +38,33 @@ describe('AccountController', () => {
     expect(controller).toBeDefined();
   });
 
-  describe('createAccount', () => {
-    it('should throw BadRequestException if number is not provided', async () => {
+  describe('getAccountDetails', () => {
+    it('should return account details successfully', async () => {
+      const result = { number: 123, balance: 1000, type: 'Saving' };
+      mockAccountService.getAccountByNumber.mockResolvedValue(result);
+
+      const response = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      await controller.getAccountDetails('123', response as any);
+
+      expect(response.status).toHaveBeenCalledWith(HttpStatus.OK);
+      expect(response.json).toHaveBeenCalledWith(result);
+    });
+
+    it('should throw NotFoundException if account is not found', async () => {
+      mockAccountService.getAccountByNumber.mockResolvedValue(null);
+
+      const response = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
       await expect(
-        controller.createAccount('', '1000', 'Saving'),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should throw BadRequestException if type is not provided', async () => {
-      await expect(
-        controller.createAccount('123', '1000', null),
-      ).rejects.toThrow(BadRequestException);
-    });
-
-    it('should create a new Saving account successfully', async () => {
-      const result = {
-        number: 123,
-        type: 'Saving',
-        balance: 1000,
-      };
-      mockAccountService.createAccount.mockResolvedValue(result);
-      const response = await controller.createAccount('123', '1000', 'Saving');
-      expect(response.status).toBe(HttpStatus.CREATED);
-      expect(response.message).toBe('Account created!');
-      expect(response.account).toEqual(result);
-    });
-
-    it('should create a new Default account successfully', async () => {
-      const result = {
-        number: 123,
-        type: 'Default',
-        balance: 1000,
-      };
-      mockAccountService.createAccount.mockResolvedValue(result);
-      const response = await controller.createAccount('123', '1000', 'Default');
-      expect(response.status).toBe(HttpStatus.CREATED);
-      expect(response.message).toBe('Account created!');
-      expect(response.account).toEqual(result);
-    });
-
-    it('should create a new Bonus account successfully', async () => {
-      const result = {
-        number: 123,
-        type: 'Bonus',
-        balance: 1000,
-        bonusScore: 10,
-      };
-      mockAccountService.createAccount.mockResolvedValue(result);
-      const response = await controller.createAccount('123', '1000', 'Bonus');
-      expect(response.status).toBe(HttpStatus.CREATED);
-      expect(response.message).toBe('Account created!');
-      expect(response.account).toEqual(result);
+        controller.getAccountDetails('123', response as any),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 

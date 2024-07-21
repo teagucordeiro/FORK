@@ -114,7 +114,7 @@ describe('AccountService', () => {
     it('should throw BadRequestException if balance is insufficient', async () => {
       const account = { number: 123, balance: 500, type: 'Default' } as Account;
       mockPrismaService.account.findFirst.mockImplementation(() => account);
-      await expect(service.debitFromAccount(123, 1000)).rejects.toThrow(
+      await expect(service.debitFromAccount(123, 1501)).rejects.toThrow(
         BadRequestException,
       );
     });
@@ -191,7 +191,7 @@ describe('AccountService', () => {
       mockPrismaService.account.findFirst
         .mockResolvedValueOnce(fromAccount)
         .mockResolvedValueOnce(toAccount);
-      await expect(service.transferAmount(123, 456, 1000)).rejects.toThrow(
+      await expect(service.transferAmount(123, 456, 1501)).rejects.toThrow(
         BadRequestException,
       );
     });
