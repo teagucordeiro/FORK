@@ -7,7 +7,10 @@ import {
   Param,
   BadRequestException,
   Patch,
+  NotFoundException,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { AccountService } from './account.service';
 import { ApiTags } from '@nestjs/swagger';
 import { AccountOptions } from './account.entity';
@@ -41,6 +44,21 @@ export class AccountController {
       account,
       balance,
     };
+  }
+
+  @Get(':number')
+  async getAccountDetails(
+    @Param('number') number: string,
+    @Res() response: Response,
+  ) {
+    const account = await this.accountService.getAccountByNumber(
+      Number(number),
+    );
+    if (!account) {
+      throw new NotFoundException('Account not found.');
+    }
+
+    return response.status(HttpStatus.OK).json(account);
   }
 
   @Get(':number/balance')
@@ -110,6 +128,7 @@ export class AccountController {
       updatedAccount: {
         number: updatedAccount.number,
         balance: updatedAccount.balance,
+        bonusScore: updatedAccount.bonusScore,
       },
     };
   }

@@ -10,7 +10,7 @@ async function askUser() {
   let exit = false;
   while (!exit) {
     const answer = await askForInput(
-      "Escolha a ação desejada:\n1. Criar conta\n2. Conferir saldo\n3. Debitar de uma conta\n4. Creditar em uma conta\n5. Transferir entre contas\n6. Rendimento de juros\n7. Sair\nEscolha o número da opção: "
+      "Escolha a ação desejada:\n1. Criar conta\n2. Conferir saldo\n3. Debitar de uma conta\n4. Creditar em uma conta\n5. Transferir entre contas\n6. Rendimento de juros\n7. Consultar conta\n8. Sair\nEscolha o número da opção: "
     );
 
     switch (answer) {
@@ -71,6 +71,12 @@ async function askUser() {
         yieldInterest(interestRate);
         break;
       case "7":
+        const detailsNumber = await askForInput(
+          "Digite o número da conta que deseja consultar: "
+        );
+        getAccountDetails(detailsNumber);
+        break;
+      case "8":
         exit = true;
         console.log("Saindo...");
         rl.close();
@@ -183,6 +189,20 @@ async function yieldInterest(interestRate) {
     console.log(response.data);
   } catch (error) {
     console.error("Error yielding interest:", error.response.data.message);
+  }
+}
+
+async function getAccountDetails(number) {
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/accounts/${number}`
+    );
+    console.log(response.data);
+  } catch (error) {
+    console.error(
+      "Error getting account details:",
+      error.response.data.message
+    );
   }
 }
 
