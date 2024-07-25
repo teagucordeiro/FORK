@@ -21,7 +21,7 @@ export class AccountController {
   constructor(private readonly accountService: AccountService) {}
   @Post()
   async createAccount(
-    @BodY('number') number: string,
+    @Body('number') number: string,
     @Body('balance') balance: string,
     @Body('type') type: AccountOptions,
   ) {
@@ -33,7 +33,7 @@ export class AccountController {
       throw new BadRequestException('Account type is required.');
     }
 
-    const account = await this.AccountService.createAccount(
+    const account = await this.accountService.createAccount(
       Number(number),
       type,
       Number(balance),
